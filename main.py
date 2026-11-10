@@ -327,6 +327,15 @@ say which file the numbers come from.
 instead of guessing.
 - In follow-ups, remember the file, the table_id and everything discussed earlier in this \
 conversation.
+
+Beyond the CSV, you are connected to the user's Mistral knowledge bases through the \
+'mistral' MCP server. When the user asks about background knowledge — AGI, ASI, knowledge, \
+Verath, Chrono-Scribe, AetherLinkOS, Theia, or the content of their Markdown and PDF files — \
+consult the knowledge base (list the knowledge bases, then read the relevant topic pages) and \
+summarize what it says, citing which topic page it came from. Use the 'mistral' server only to \
+read knowledge bases; never call its write or delete tools. If the knowledge base does not \
+cover the question, say so. Keep CSV analysis and knowledge-base answers clearly separate: \
+numbers about the user's CSV always come from the data tools, never from the knowledge base.
 """
 
 
@@ -340,4 +349,11 @@ agent = agents.Agent(
     instructions=INSTRUCTIONS,
     tools=[load_csv, describe_columns, filter_rows, group_by_aggregate],
     connectors=[agents.connector("google_drive_mcp")],
+    mcps={
+        "mistral": agents.RemoteMCP(
+            url="https://api.mistral.ai/mcp",
+            auth_header_env_vars={"Authorization": "MISTRAL_MCP_AUTHORIZATION"},
+            model_access="direct",
+        )
+    },
 )
